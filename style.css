@@ -10,9 +10,17 @@
 #controller {
     display: flex;
     flex-direction: column;
+    width: 300px;
+    height: 300px;
 }
 
 #controller div {
     display: flex;
     flex-direction: row;
+    width: 300px;
+    height: 100px;
+}
+
+#controller div button {
+    width: 100%;
 }
