@@ -9,16 +9,38 @@
 <body>
     
     <script>
-        function takeImage() {
+        function photo() {
             fetch("http://localhost:8000/takeImage")
+        }
+        function forward() {
+            fetch("http://localhost:8000/forward")
+        }
+        function backward() {
+            fetch("http://localhost:8000/backward")
+        }
+        function right() {
+            fetch("http://localhost:8000/right")
+        }
+        function left() {
+            fetch("http://localhost:8000/left")
+        }
+        function up() {
+            fetch("http://localhost:8000/up")
+        }
+        function down() {
+            fetch("http://localhost:8000/down")
+        }
+        function stop() {
+            fetch("http://localhost:8000/stop")
         }
     </script>
 
     <div id="container">
         <iframe src="http://localhost:8000/videoFeed" frameborder="0"></iframe>
-        <div>
-            <h1>CONTROLS</h1>
-            <button onclick="takeImage()">Take Image</button>
+        <div id="controller">
+            <div><button></button><button onclick="forward()">Forward</button><button onclick="up()">Up</button></div>
+            <div><button onclick="left()">Left</button><button onclick="stop()">Stop</button><button onclick="right()">Right</button></div>
+            <div><button onclick="photo()">Photo</button><button onclick="backward()">Backward</button><button onclick="down()">Down</button></div>
         </div>
     </div>
 

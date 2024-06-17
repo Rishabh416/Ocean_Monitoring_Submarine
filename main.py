@@ -28,8 +28,42 @@ async def videoFeed():
 @app.get("/takeImage")
 async def takeImage():
     picam2.capture_file(f"{time.time()}.jpg")
-    print("Taken image")
     return("captured")
+
+@app.get("/forward")
+async def forward():
+    print("forward") # replace with movement forward code
+    return("forward")    
+
+@app.get("/backward")
+async def backward():
+    print("backward") # replace with movement backward code
+    return("backward")    
+
+@app.get("/right")
+async def right():
+    print("right") # replace with movement right code
+    return("right")    
+
+@app.get("/left")
+async def left():
+    print("left") # replace with movement left code
+    return("left")    
+
+@app.get("/up")
+async def up():
+    print("up") # replace with movement up code
+    return("up")    
+
+@app.get("/down")
+async def down():
+    print("down") # replace with movement down code
+    return("down")    
+
+@app.get("/stop")
+async def stop():
+    print("stop") # replace with movement stop code
+    return("stop")    
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
