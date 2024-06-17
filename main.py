@@ -1,7 +1,5 @@
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
-from picamera2 import Picamera2, Preview
-import io
+from fastapi import FastAPI, Response
+from picamera2 import Picamera2
 import cv2
 
 app = FastAPI()
@@ -12,18 +10,16 @@ config = picam2.create_preview_configuration(main={"size": (640, 480)})
 picam2.configure(config)
 picam2.start()
 
-def generate_frames():
-    while True:
-        frame = picam2.capture_array()
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
 @app.get("/video_feed")
 async def video_feed():
-    return StreamingResponse(generate_frames(), media_type="multipart/x-mixed-replace; boundary=frame")
+    # Capture a single frame as a numpy array
+    frame = picam2.capture_array()
+    # Encode the frame as JPEG
+    ret, buffer = cv2.imencode('.jpg', frame)
+    # Create a response with the JPEG image
+    return Response(content=buffer.tobytes(), media_type="image/jpeg")
 
 if __name__ == "__main__":
-    import uvicorn
+    import uvicorn  # Import uvicorn for running the FastAPI app
+    # Run the app on all available IP addresses (0.0.0.0) at port 8000
     uvicorn.run(app, host="0.0.0.0", port=8000)
