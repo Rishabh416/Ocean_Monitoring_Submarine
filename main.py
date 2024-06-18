@@ -1,5 +1,6 @@
 from fastapi import FastAPI  
 from fastapi.responses import StreamingResponse  
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn 
 from picamera2 import Picamera2, Preview  
 import io  
@@ -7,6 +8,14 @@ import cv2
 import time
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 picam2 = Picamera2()
 config = picam2.create_preview_configuration(main={"size": (640, 480)})
