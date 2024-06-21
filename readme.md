@@ -40,3 +40,4 @@ static domain_name_servers=192.168.137.1
 - Go to the **sharing** tab and enable **Allow other network users to connect through this computer's Internet connection**
 
 - Verify connectivity by running ```ping google.com``` on the Raspberry Pi
+- Disable Wi-Fi on the Raspberry Pi by accessing ```sudo nano /boot/firmware/config.txt``` and adding ```dtoverlay=disable-wifi``` at the bottom of the file
