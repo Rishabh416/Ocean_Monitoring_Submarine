@@ -34,6 +34,12 @@ Arducam 5MP OV5647
 - Open a Terminal window on your laptop/PC and enter ```ssh {username}@pi.local```, alternatively you can replace pi.local with the IP address of the Raspberry Pi (can be accessed through your routers admin page)
 - Enter your password and you should be able to SSH into the Raspberry PI
 
+**Boot settings for Arducam 5MP OV5647**
+- Run the following command ```sudo nano /boot/firmware/config.txt```
+- Find the line mentioning **camera_auto_detect** and set its value to **0**
+- Go to the bottom of the file (below \[all\]) and add the following line under **dtoverlay=ov5647**
+- Click **Ctrl + X** to exit, click **Y** to save changes, click **Enter** to save and exit the file
+
 ## Ethernet Networking Setup (Windows)
 **On Windows PC/Laptop**
 - Open Windows Network Connections by clicking  **Win + R** and then typing **ncpa.cpl**
