@@ -8,6 +8,7 @@
 </head>
 <body>
     
+    <!-- setup of functions in JavaScript which will call backend apis -->
     <script>
         function photo() {
             fetch("http://localhost:8000/takeImage")
@@ -35,8 +36,11 @@
         }
     </script>
 
+    <!-- HTML code for frontend interface -->
     <div id="container">
+        <!-- iframe will display the content from the src provided, the live video stream from the hosted API -->
         <iframe src="http://localhost:8000/videoFeed" frameborder="0"></iframe>
+        <!-- Container for submarine controls which contain a 9-key pad controlling different functions/movement -->
         <div id="controller">
             <div><button></button><button onclick="forward()">Forward</button><button onclick="up()">Up</button></div>
             <div><button onclick="left()">Left</button><button onclick="stop()">Stop</button><button onclick="right()">Right</button></div>
