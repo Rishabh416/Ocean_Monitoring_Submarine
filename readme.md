@@ -1,4 +1,4 @@
-# Research Project with Rochester Institute of Technology, Dubai
+# Research Project for Ocean Monitoring
 This project works on creating a ocean monitoring submarine. The system is equipped with a Raspberry Pi 4 Model B which is able to capture live video feed through an Arducam 5MP camera. The Raspberry Pi uses the Picamera2 library to interface with the camera. The live video feed is displayed on a webUI which also facilitates a 9-key control system to maneuver the submarine. 
 
 ## Hardware
