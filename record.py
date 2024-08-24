@@ -21,9 +21,7 @@ while button.is_pressed:
     frame = cam.capture_array()  
     frame = cv2.resize(frame, (640, 480))
     out.write(frame)
-    cv2.imshow('Video', frame)
 
 print("complete")
 # Release everything if job is finished
 out.release()
-cv2.destroyAllWindows()
