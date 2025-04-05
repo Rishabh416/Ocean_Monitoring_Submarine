@@ -1,85 +1,93 @@
-from fastapi import FastAPI  # API endpoint import
-from fastapi.responses import StreamingResponse # live streaming import
-from fastapi.middleware.cors import CORSMiddleware # Cross-origin resource sharing policy override import
-import uvicorn # live server/API host library
-from picamera2 import Picamera2  # camera interface library
-import cv2 # image processing library
-import time # current time details library
+import tkinter as tk
+from tkinter import ttk
+from PIL import Image, ImageTk
+import cv2
+import threading
+import time
+from picamera2 import Picamera2
 
-# initialize API
-app = FastAPI()
-
-# override CORS policy on browsers
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# initialize camera and set its configuration (480p resolution)
+# Initialize camera
 cam = Picamera2()
 config = cam.create_preview_configuration(main={"size": (640, 480)})
-cam.configure(config)  
-cam.start()  
+cam.configure(config)
+cam.start()
 
-# function to get current frame, encode as jpg and convert it into bytes
-def generate_frames():
-    while True:  
-        frame = cam.capture_array()  
-        ret, buffer = cv2.imencode('.jpg', frame)  
-        frame = buffer.tobytes()  
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+# GUI Application
+class CameraApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Submarine Control Panel")
+        self.is_recording = False
+        self.video_writer = None
 
-# API endpoint for live video streaming from camera
-@app.get("/videoFeed")
-async def videoFeed():
-    return StreamingResponse(generate_frames(), media_type="multipart/x-mixed-replace; boundary=frame")
+        # Video feed display
+        self.label = tk.Label(root)
+        self.label.pack()
 
-# API endpoint for capturing current image of camera, name of image is set to current timestamp
-@app.get("/takeImage")
-async def takeImage():
-    cam.capture_file(f"{time.time()}.jpg")
-    return("captured")
+        # Scrollbars (you can bind these to commands)
+        self.scroll_x = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="X Axis")
+        self.scroll_x.pack(fill="x")
 
-# following set of functions are for controlling the movement of a submarine
-@app.get("/forward")
-async def forward():
-    print("forward") # replace with movement forward code
-    return("forward")    
+        self.scroll_y = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Y Axis")
+        self.scroll_y.pack(fill="x")
 
-@app.get("/backward")
-async def backward():
-    print("backward") # replace with movement backward code
-    return("backward")    
+        self.scroll_z = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Z Axis")
+        self.scroll_z.pack(fill="x")
 
-@app.get("/right")
-async def right():
-    print("right") # replace with movement right code
-    return("right")    
+        # Control buttons
+        self.btn_frame = tk.Frame(root)
+        self.btn_frame.pack()
 
-@app.get("/left")
-async def left():
-    print("left") # replace with movement left code
-    return("left")    
+        self.record_btn = ttk.Button(self.btn_frame, text="Start Recording", command=self.toggle_recording)
+        self.record_btn.grid(row=0, column=0, padx=5)
 
-@app.get("/up")
-async def up():
-    print("up") # replace with movement up code
-    return("up")    
+        self.photo_btn = ttk.Button(self.btn_frame, text="Take Photo", command=self.take_photo)
+        self.photo_btn.grid(row=0, column=1, padx=5)
 
-@app.get("/down")
-async def down():
-    print("down") # replace with movement down code
-    return("down")    
+        self.update_frame()
 
-@app.get("/stop")
-async def stop():
-    print("stop") # replace with movement stop code
-    return("stop")    
+    def update_frame(self):
+        frame = cam.capture_array()
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        if self.is_recording and self.video_writer:
+            self.video_writer.write(frame)
 
-# run the API on a localhost server at port 8000
+        img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        imgtk = ImageTk.PhotoImage(image=img)
+        self.label.imgtk = imgtk
+        self.label.configure(image=imgtk)
+
+        self.root.after(10, self.update_frame)
+
+    def toggle_recording(self):
+        if not self.is_recording:
+            self.start_recording()
+        else:
+            self.stop_recording()
+
+    def start_recording(self):
+        filename = f"recording_{int(time.time())}.avi"
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        self.video_writer = cv2.VideoWriter(filename, fourcc, 20.0, (640, 480))
+        self.is_recording = True
+        self.record_btn.config(text="Stop Recording")
+        print("Recording started...")
+
+    def stop_recording(self):
+        if self.video_writer:
+            self.video_writer.release()
+            self.video_writer = None
+        self.is_recording = False
+        self.record_btn.config(text="Start Recording")
+        print("Recording stopped.")
+
+    def take_photo(self):
+        filename = f"photo_{int(time.time())}.jpg"
+        cam.capture_file(filename)
+        print(f"Photo saved as {filename}")
+
+# Run the GUI
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    root = tk.Tk()
+    app = CameraApp(root)
+    root.mainloop()

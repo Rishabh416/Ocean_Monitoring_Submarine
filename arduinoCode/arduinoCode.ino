@@ -2,11 +2,20 @@
 
 Servo motor1;
 #define motorPin1 9
+#define motorPin2 10
+#define motorPin3 11
 
 void setup() {
   // put your setup code here, to run once:
   motor1.attach(motorPin1);
   motor1.writeMicroseconds(1500);
+  
+  motor2.attach(motorPin2);
+  motor2.writeMicroseconds(1500);
+  
+  motor3.attach(motorPin3);
+  motor3.writeMicroseconds(1500);
+
   Serial.begin(9600);
   delay(5000);
 }
@@ -30,6 +39,14 @@ void loop() {
 
       if (motor == 1) {
         motor1.writeMicroseconds(speed);
+      }
+
+      if (motor == 2) {
+        motor2.writeMicroseconds(speed);
+      }
+
+      if (motor == 3) {
+        motor3.writeMicroseconds(speed);
       }
       
     }
