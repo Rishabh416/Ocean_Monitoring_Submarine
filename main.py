@@ -25,14 +25,21 @@ class CameraApp:
         self.label.pack()
 
         # Scrollbars (you can bind these to commands)
-        self.scroll_x = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="X Axis")
+        self.scroll_x = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="X Axis", resolution=1)
+        self.scroll_x.set(1500)
         self.scroll_x.pack(fill="x")
+        self.scroll_x.bind("<ButtonRelease-1>", lambda e: self.snap_to_mid(self.scroll_x))
 
-        self.scroll_y = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Y Axis")
+        self.scroll_y = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Y Axis", resolution=1)
+        self.scroll_y.set(1500)
         self.scroll_y.pack(fill="x")
+        self.scroll_y.bind("<ButtonRelease-1>", lambda e: self.snap_to_mid(self.scroll_y))
 
-        self.scroll_z = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Z Axis")
+        self.scroll_z = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Z Axis", resolution=1)
+        self.scroll_z.set(1500)
         self.scroll_z.pack(fill="x")
+        self.scroll_z.bind("<ButtonRelease-1>", lambda e: self.snap_to_mid(self.scroll_z))
+
 
         # Control buttons
         self.btn_frame = tk.Frame(root)
@@ -45,6 +52,12 @@ class CameraApp:
         self.photo_btn.grid(row=0, column=1, padx=5)
 
         self.update_frame()
+
+    def snap_to_mid(self, slider):
+        value = slider.get()
+        if abs(value - 1500) < 50:  # threshold for snapping
+            slider.set(1500)
+
 
     def update_frame(self):
         frame = cam.capture_array()
