@@ -13,7 +13,7 @@ config = cam.create_preview_configuration(main={"size": (640, 480)})
 cam.configure(config)
 cam.start()
 
-ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial('/dev/ttyUSB0', 9600)
 time.sleep(2)
 ser.write(b'Serial Connection Established\n')
 
@@ -33,20 +33,17 @@ class CameraApp:
         self.scroll_x = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="X Axis", resolution=1)
         self.scroll_x.set(1500)
         self.scroll_x.pack(fill="x")
-        self.scroll_x.bind("<ButtonRelease-1>", lambda e: self.snap_to_mid(self.scroll_x))
-        self.scroll_x.bind("<ButtonRelease-1>", ser.write(f'm1{self.scroll_x.value}\n'))
+        self.scroll_x.bind("<ButtonRelease-1>", lambda e: self.on_slider_release(self.scroll_x, 'm1'))
 
         self.scroll_y = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Y Axis", resolution=1)
         self.scroll_y.set(1500)
         self.scroll_y.pack(fill="x")
-        self.scroll_y.bind("<ButtonRelease-1>", lambda e: self.snap_to_mid(self.scroll_y))
-        self.scroll_y.bind("<ButtonRelease-1>", ser.write(f'm2{self.scroll_y.value}\n'))
+        self.scroll_y.bind("<ButtonRelease-1>", lambda e: self.on_slider_release(self.scroll_y, 'm2'))
 
         self.scroll_z = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Z Axis", resolution=1)
         self.scroll_z.set(1500)
         self.scroll_z.pack(fill="x")
-        self.scroll_z.bind("<ButtonRelease-1>", lambda e: self.snap_to_mid(self.scroll_z))
-        self.scroll_z.bind("<ButtonRelease-1>", ser.write(f'm3{self.scroll_z.value}\n'))
+        self.scroll_z.bind("<ButtonRelease-1>", lambda e: self.on_slider_release(self.scroll_z, 'm3'))
 
         # Control buttons
         self.btn_frame = tk.Frame(root)
@@ -60,10 +57,14 @@ class CameraApp:
 
         self.update_frame()
 
-    def snap_to_mid(self, slider):
+    def on_slider_release(self, slider, prefix):
         value = slider.get()
         if abs(value - 1500) < 50:  # threshold for snapping
             slider.set(1500)
+        value = slider.get()
+        print(f"Slider released: {prefix}{value}")
+        ser.write(f"{prefix}{value}\n".encode()) 
+
 
     def update_frame(self):
         frame = cam.capture_array()
