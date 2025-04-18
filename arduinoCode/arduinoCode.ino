@@ -1,6 +1,8 @@
 #include <Servo.h>
 
 Servo motor1;
+Servo motor2;
+Servo motor3;
 #define motorPin1 9
 #define motorPin2 10
 #define motorPin3 11
