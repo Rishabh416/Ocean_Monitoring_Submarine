@@ -7,7 +7,6 @@ import time
 from picamera2 import Picamera2
 import serial
 
-# Initialize camera
 cam = Picamera2()
 config = cam.create_preview_configuration(main={"size": (640, 480)})
 cam.configure(config)
@@ -17,7 +16,6 @@ ser = serial.Serial('/dev/ttyUSB0', 9600)
 time.sleep(2)
 ser.write(b'Serial Connection Established\n')
 
-# GUI Application
 class CameraApp:
     def __init__(self, root):
         self.root = root
@@ -25,11 +23,10 @@ class CameraApp:
         self.is_recording = False
         self.video_writer = None
 
-        # Video feed display
+        
         self.label = tk.Label(root)
         self.label.pack()
 
-        # Scrollbars (you can bind these to commands)
         self.scroll_x = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="X Axis", resolution=1)
         self.scroll_x.set(1500)
         self.scroll_x.pack(fill="x")
@@ -45,7 +42,6 @@ class CameraApp:
         self.scroll_z.pack(fill="x")
         self.scroll_z.bind("<ButtonRelease-1>", lambda e: self.on_slider_release(self.scroll_z, 'm3'))
 
-        # Control buttons
         self.btn_frame = tk.Frame(root)
         self.btn_frame.pack()
 
@@ -105,8 +101,7 @@ class CameraApp:
         filename = f"photo_{int(time.time())}.jpg"
         cam.capture_file(filename)
         print(f"Photo saved as {filename}")
-
-# Run the GUI
+        
 if __name__ == "__main__":
     root = tk.Tk()
     app = CameraApp(root)
