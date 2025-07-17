@@ -7,6 +7,7 @@ import time
 from picamera2 import Picamera2
 import serial
 
+# Initialize camera
 cam = Picamera2()
 config = cam.create_preview_configuration(main={"size": (640, 480)})
 cam.configure(config)
@@ -23,27 +24,38 @@ class CameraApp:
         self.is_recording = False
         self.video_writer = None
 
-        
-        self.label = tk.Label(root)
-        self.label.pack()
+        # === Layout Frames ===
+        self.left_frame = tk.Frame(root)
+        self.center_frame = tk.Frame(root)
+        self.right_frame = tk.Frame(root)
 
-        self.scroll_x = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="X Axis", resolution=1)
+        self.left_frame.pack(side="left", fill="y")
+        self.center_frame.pack(side="left", expand=True, fill="both")
+        self.right_frame.pack(side="left", fill="y")
+
+        # === Left Vertical Slider: X Axis ===
+        self.scroll_x = tk.Scale(self.left_frame, from_=2000, to=1000, orient="vertical", label="X Axis", resolution=1)
         self.scroll_x.set(1500)
-        self.scroll_x.pack(fill="x")
+        self.scroll_x.pack(padx=10, pady=10, fill="y", expand=True)
         self.scroll_x.bind("<ButtonRelease-1>", lambda e: self.on_slider_release(self.scroll_x, 'm1'))
 
-        self.scroll_y = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Y Axis", resolution=1)
+        # === Right Vertical Slider: Y Axis ===
+        self.scroll_y = tk.Scale(self.right_frame, from_=2000, to=1000, orient="vertical", label="Y Axis", resolution=1)
         self.scroll_y.set(1500)
-        self.scroll_y.pack(fill="x")
+        self.scroll_y.pack(padx=10, pady=10, fill="y", expand=True)
         self.scroll_y.bind("<ButtonRelease-1>", lambda e: self.on_slider_release(self.scroll_y, 'm2'))
 
-        self.scroll_z = tk.Scale(root, from_=1000, to=2000, orient="horizontal", label="Z Axis", resolution=1)
+        # === Center Frame Content ===
+        self.label = tk.Label(self.center_frame)
+        self.label.pack()
+
+        self.scroll_z = tk.Scale(self.center_frame, from_=1000, to=2000, orient="horizontal", label="Z Axis", resolution=1)
         self.scroll_z.set(1500)
-        self.scroll_z.pack(fill="x")
+        self.scroll_z.pack(fill="x", padx=20, pady=5)
         self.scroll_z.bind("<ButtonRelease-1>", lambda e: self.on_slider_release(self.scroll_z, 'm3'))
 
-        self.btn_frame = tk.Frame(root)
-        self.btn_frame.pack()
+        self.btn_frame = tk.Frame(self.center_frame)
+        self.btn_frame.pack(pady=10)
 
         self.record_btn = ttk.Button(self.btn_frame, text="Start Recording", command=self.toggle_recording)
         self.record_btn.grid(row=0, column=0, padx=5)
@@ -55,16 +67,16 @@ class CameraApp:
 
     def on_slider_release(self, slider, prefix):
         value = slider.get()
-        if abs(value - 1500) < 50:  # threshold for snapping
+        if abs(value - 1500) < 50:
             slider.set(1500)
         value = slider.get()
         print(f"Slider released: {prefix}{value}")
         ser.write(f"{prefix}{value}\n".encode()) 
 
-
     def update_frame(self):
         frame = cam.capture_array()
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        frame = cv2.flip(frame, 0)
         if self.is_recording and self.video_writer:
             self.video_writer.write(frame)
 
@@ -101,7 +113,8 @@ class CameraApp:
         filename = f"photo_{int(time.time())}.jpg"
         cam.capture_file(filename)
         print(f"Photo saved as {filename}")
-        
+
+# Run the GUI
 if __name__ == "__main__":
     root = tk.Tk()
     app = CameraApp(root)
